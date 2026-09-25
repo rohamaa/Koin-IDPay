@@ -5,7 +5,7 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
-use Rohama\Koin\Enums\Currency;
+use Rohama\Koin\Support\Currency;
 use Rohama\Koin\Exception\InvalidRequestException;
 use Rohama\Koin\Exception\VerificationFailedException;
 use Rohama\Koin\IDPay\IDPayGateway;
@@ -22,7 +22,7 @@ final class IDPayGatewayTest extends TestCase
 
         $result = $gateway->parseCallback([], ['id' => 'i1', 'order_id' => 'o1', 'status' => 10, 'track_id' => '10012', 'amount' => '10000', 'card_no' => '123456******1234']);
 
-        $this->assertSame('success', $result->status->value);
+        $this->assertSame('success', $result->status);
         $this->assertSame('i1', $result->transactionId);
         $this->assertSame('o1', $result->orderId);
         $this->assertSame('10012', $result->track_id);
@@ -39,7 +39,7 @@ final class IDPayGatewayTest extends TestCase
 
         $result = $gateway->parseCallback([], ['id' => 'i1', 'order_id' => 'o1', 'status' => 10]);
 
-        $this->assertSame('failed', $result->status->value);
+        $this->assertSame('failed', $result->status);
     }
 
     public function testParseCallbackPropagatesVerifyErrors(): void
@@ -59,7 +59,7 @@ final class IDPayGatewayTest extends TestCase
         $gateway = new IDPayGateway('k');
         $result = $gateway->parseCallback([], ['id' => 'i1', 'order_id' => 'o1', 'status' => 100]);
 
-        $this->assertSame('success', $result->status->value);
+        $this->assertSame('success', $result->status);
     }
 
     public function testParseCallbackMapsDepositedToSuccess(): void
@@ -67,7 +67,7 @@ final class IDPayGatewayTest extends TestCase
         $gateway = new IDPayGateway('k');
         $result = $gateway->parseCallback([], ['id' => 'i1', 'order_id' => 'o1', 'status' => 200]);
 
-        $this->assertSame('success', $result->status->value);
+        $this->assertSame('success', $result->status);
     }
 
     public function testParseCallbackMapsStatus7ToCanceled(): void
@@ -75,7 +75,7 @@ final class IDPayGatewayTest extends TestCase
         $gateway = new IDPayGateway('k');
         $result = $gateway->parseCallback([], ['id' => 'i1', 'order_id' => 'o1', 'status' => 7]);
 
-        $this->assertSame('canceled', $result->status->value);
+        $this->assertSame('canceled', $result->status);
     }
 
     public function testParseCallbackMapsOtherStatusesToFailed(): void
@@ -83,7 +83,7 @@ final class IDPayGatewayTest extends TestCase
         $gateway = new IDPayGateway('k');
         $result = $gateway->parseCallback([], ['id' => 'i1', 'order_id' => 'o1', 'status' => 1]);
 
-        $this->assertSame('failed', $result->status->value);
+        $this->assertSame('failed', $result->status);
     }
 
     public function testVerifyAcceptsStringAmountInRial(): void
@@ -95,7 +95,7 @@ final class IDPayGatewayTest extends TestCase
 
         $result = $gateway->verify('i1', 'o1', 10000);
 
-        $this->assertSame('success', $result->status->value);
+        $this->assertSame('success', $result->status);
         $this->assertSame('10012', $result->referenceId);
         $this->assertSame(10000, $result->amount);
     }
@@ -109,7 +109,7 @@ final class IDPayGatewayTest extends TestCase
 
         $result = $gateway->verify('i1', 'o1');
 
-        $this->assertSame('success', $result->status->value);
+        $this->assertSame('success', $result->status);
         $this->assertSame(10000, $result->amount);
     }
 
@@ -122,7 +122,7 @@ final class IDPayGatewayTest extends TestCase
 
         $result = $gateway->verify('i1', 'o1', 1000, Currency::TOMAN);
 
-        $this->assertSame('success', $result->status->value);
+        $this->assertSame('success', $result->status);
         $this->assertSame(10000, $result->amount);
     }
 
@@ -135,7 +135,7 @@ final class IDPayGatewayTest extends TestCase
 
         $result = $gateway->verify('i1', 'o1');
 
-        $this->assertSame('success', $result->status->value);
+        $this->assertSame('success', $result->status);
     }
 
     public function testVerifyRejectsMismatchedAmount(): void
@@ -159,7 +159,7 @@ final class IDPayGatewayTest extends TestCase
 
         $result = $gateway->verify('i1', 'o1');
 
-        $this->assertSame('failed', $result->status->value);
+        $this->assertSame('failed', $result->status);
     }
 
     public function testInquiryMapsStatus10ToPending(): void
@@ -171,7 +171,7 @@ final class IDPayGatewayTest extends TestCase
 
         $result = $gateway->inquiry('i1', 'o1');
 
-        $this->assertSame('pending', $result->status->value);
+        $this->assertSame('pending', $result->status);
         $this->assertSame(10000, $result->amount);
     }
 
@@ -184,7 +184,7 @@ final class IDPayGatewayTest extends TestCase
 
         $result = $gateway->inquiry('i1', 'o1');
 
-        $this->assertSame('success', $result->status->value);
+        $this->assertSame('success', $result->status);
     }
 
     public function testRequestSendsPayerNameFromMetadata(): void
@@ -240,7 +240,7 @@ final class IDPayGatewayTest extends TestCase
             callbackUrl: 'https://example.com/cb',
         );
 
-        $this->assertSame('pending', $result->status->value);
+        $this->assertSame('pending', $result->status);
         $this->assertNotSame('', $result->transactionId);
     }
 

@@ -3,8 +3,8 @@
 namespace Rohama\Koin\IDPay;
 
 use GuzzleHttp\Client;
-use Rohama\Koin\Enums\Currency;
-use Rohama\Koin\Enums\PaymentStatus;
+use Rohama\Koin\Support\Currency;
+use Rohama\Koin\Support\PaymentStatus;
 use Rohama\Koin\Exception\InvalidRequestException;
 use Rohama\Koin\Exception\PaymentFailedException;
 use Rohama\Koin\Exception\VerificationFailedException;
@@ -103,7 +103,7 @@ class IDPayGateway implements PaymentGateway, InquiryGateway, TransactionListGat
         string $description = '',
         ?string $mobile = null,
         ?string $email = null,
-        ?Currency $currency = null,
+        ?string $currency = null,
         array $metadata = [],
         array $extra = [],
     ): PaymentResponse {
@@ -119,7 +119,7 @@ class IDPayGateway implements PaymentGateway, InquiryGateway, TransactionListGat
             throw new InvalidRequestException('IDPay requires a callback URL.', gateway: self::name);
         }
 
-        $rial = ($currency ?? Currency::RIAL)->toRial($amount);
+        $rial = Currency::toRial($currency ?? Currency::RIAL, $amount);
 
         if ($rial < self::MIN_AMOUNT) {
             throw new InvalidRequestException('IDPay requires an amount of at least 1,000 Rial.', gateway: self::name);
@@ -161,7 +161,7 @@ class IDPayGateway implements PaymentGateway, InquiryGateway, TransactionListGat
         string $transactionId,
         string $orderId = '',
         ?int $amount = null,
-        ?Currency $currency = null,
+        ?string $currency = null,
         array $extra = [],
     ): VerificationResponse {
         if ($orderId === '') {
@@ -189,7 +189,7 @@ class IDPayGateway implements PaymentGateway, InquiryGateway, TransactionListGat
         $expect = null;
 
         if ($amount !== null) {
-            $expect = ($currency ?? Currency::RIAL)->toRial($amount);
+            $expect = Currency::toRial($currency ?? Currency::RIAL, $amount);
 
             if ($data['amount'] != $expect) {
                 throw new VerificationFailedException(
@@ -247,7 +247,7 @@ class IDPayGateway implements PaymentGateway, InquiryGateway, TransactionListGat
         string $transactionId,
         string $orderId = '',
         ?int $amount = null,
-        ?Currency $currency = null,
+        ?string $currency = null,
         array $extra = [],
     ): VerificationResponse {
         if ($orderId === '') {

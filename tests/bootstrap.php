@@ -21,4 +21,3 @@ function mockHttp(array $responses): Client
 
     return new Client(['handler' => new MockHandler($queue)]);
 }
-
