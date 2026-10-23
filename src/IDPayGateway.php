@@ -55,9 +55,9 @@ class IDPayGateway implements PaymentGateway, InquiryGateway, TransactionListGat
         return $status >= self::STATUS_PAID;
     }
 
-    public function __construct(string $apiKey, ?string $callbackUrl = null, bool $sandbox = false, array $extra = [])
+    public function __construct(string $apiKey, ?string $callbackUrl = null, bool $sandbox = false, array $extra = [], bool $refundable = false)
     {
-        $this->paymentConstruct($apiKey, $callbackUrl, $sandbox, $extra);
+        $this->paymentConstruct($apiKey, $callbackUrl, $sandbox, $extra, $refundable);
 
         Translator::register('Koin-IDPay', dirname(__DIR__) . '/lang');
         $this->client = new Client([

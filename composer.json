@@ -18,7 +18,7 @@
     "prefer-stable": true,
     "require": {
         "php": "^8.0",
-        "rohama/koin-core": "^2.2"
+        "rohama/koin-core": "^2.2.1"
     },
     "extra": {
         "branch-alias": {
